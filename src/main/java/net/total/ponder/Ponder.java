@@ -7,6 +7,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.total.ponder.block.PonderOrbs;
 import net.total.ponder.entity.PonderEntities;
+import net.total.ponder.item.PonderItems;
 import net.total.ponder.statistics.PonderingStat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ public class Ponder implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		PonderOrbs.registerPondering();
+		PonderItems.registerPonderingItems();
 		PonderingStat.registerStats();
 		PonderEntities.registerModEntityTypes();
 		PonderEntities.registerAttributes();

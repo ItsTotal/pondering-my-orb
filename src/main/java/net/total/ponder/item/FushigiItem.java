@@ -10,6 +10,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import net.total.ponder.entity.FushigiProjectileEntity;
+import net.total.ponder.entity.PonderEntities;
 
 public class FushigiItem extends Item {
     public FushigiItem(Settings settings) {
@@ -21,8 +22,9 @@ public class FushigiItem extends Item {
         ItemStack itemStack = user.getStackInHand(hand);
         world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5f, 0.4f / (world.getRandom().nextFloat() * 0.4f + 0.8f));
         if (!world.isClient) {
-            FushigiProjectileEntity fushigi = new FushigiProjectileEntity(world, user);
+            FushigiProjectileEntity fushigi = PonderEntities.FUSHIGI.create(world);
             fushigi.setVelocity(user, user.getPitch(), user.getYaw(), 0.0f, 1.5f, 0f);
+            fushigi.setPosition(user.getEyePos());
             world.spawnEntity(fushigi);
         }
 

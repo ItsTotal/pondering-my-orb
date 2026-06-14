@@ -4,6 +4,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -12,22 +14,15 @@ import net.minecraft.world.World;
 import net.total.ponder.item.PonderItems;
 import org.joml.Vector2f;
 
-public class FushigiProjectileEntity extends PersistentProjectileEntity {
+public class FushigiProjectileEntity extends ThrownItemEntity {
     private float rotation;
     public Vector2f groundedOffset;
 
-    public FushigiProjectileEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
+    public FushigiProjectileEntity(EntityType<? extends ThrownItemEntity> entityType, World world) {
         super(entityType, world);
     }
 
-    public FushigiProjectileEntity(World world, PlayerEntity player){
-        super(PonderEntities.FUSHIGI, player, world, new ItemStack(PonderItems.FUSHIGI), null);
-    }
 
-    @Override
-    protected ItemStack getDefaultItemStack() {
-        return new ItemStack(PonderItems.FUSHIGI);
-    }
 
     public float getRenderingRotation(){
         rotation += 0.5f;
@@ -37,9 +32,6 @@ public class FushigiProjectileEntity extends PersistentProjectileEntity {
         return rotation;
     }
 
-    public boolean isGrounded(){
-        return inGround;
-    }
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
@@ -60,5 +52,10 @@ public class FushigiProjectileEntity extends PersistentProjectileEntity {
         if(blockHitResult.getSide() == Direction.DOWN){
             groundedOffset = new Vector2f(215f, 180f);
         }
+    }
+
+    @Override
+    protected Item getDefaultItem() {
+        return PonderItems.FUSHIGI;
     }
 }
