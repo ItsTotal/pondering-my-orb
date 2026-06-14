@@ -46,26 +46,29 @@
 		},
 		"firstperson_righthand": {
 			"translation": [0, 2.75, 1],
-			"scale": [0.7, 0.7, 0.7]
+			"scale": [0.42, 0.42, 0.42]
 		},
 		"firstperson_lefthand": {
 			"translation": [0, 2.75, 1],
-			"scale": [0.7, 0.7, 0.7]
+			"scale": [0.42, 0.42, 0.42]
 		},
 		"ground": {
-			"translation": [0, 2.75, 0],
-			"scale": [0.66, 0.66, 0.66]
+			"translation": [0, 2.5, 0],
+			"scale": [0.48, 0.48, 0.48]
 		},
 		"gui": {
 			"rotation": [0, -180, 0],
 			"translation": [0, 2, 0]
 		},
 		"head": {
-			"translation": [0, 2.56, 0],
-			"scale": [1.281, 1.281, 1.281]
+			"translation": [0, 3.06, 0],
+			"scale": [1.49, 1.49, 1.49]
 		},
 		"fixed": {
-			"translation": [0, 2.75, 1]
+			"translation": [0, 2.75, -5.25]
+		},
+		"on_shelf": {
+			"translation": [0, 0, 2.25]
 		}
 	}
 }
