@@ -4,6 +4,7 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
@@ -12,7 +13,7 @@ import net.total.ponder.Ponder;
 
 public class PonderOrbs {
     public static final Block PONDERING_ORB = registerBlock("pondering_orb",
-            new OrbBlock(AbstractBlock.Settings.create().strength(4f).sounds(BlockSoundGroup.GLASS)));
+            new OrbBlock(AbstractBlock.Settings.create().strength(1.5f).sounds(BlockSoundGroup.GLASS).luminance(state -> 5)));
 
     private static Block registerBlock(String name, Block block){
         registerBlockItem(name, block);
@@ -27,4 +28,5 @@ public class PonderOrbs {
     public static void registerPondering(){
         Ponder.LOGGER.info("Orbing all women");
     }
+
 }

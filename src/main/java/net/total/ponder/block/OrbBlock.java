@@ -9,18 +9,21 @@ import net.minecraft.client.sound.Sound;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.total.ponder.statistics.PonderingStat;
 
 public class OrbBlock extends Block {
     public OrbBlock(Settings settings) {
@@ -35,9 +38,6 @@ public class OrbBlock extends Block {
     
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (cooldown<=0){ 
-            diceroll = (int)(Math.random()*6+1);
-        }
 
         String yes = "...Yes...";
         String certain = "...It is Certain..."; 
@@ -67,17 +67,20 @@ public class OrbBlock extends Block {
         } else {
             Ponder = false;
         }
-        for (int i = 0; i < 20; i++) {
-            System.out.println(i);
+        for (int i = 0; i < cooldown+1 && cooldown !=0; i++) {
+            System.out.println(cooldown);
             if (cooldown >= 0){
              cooldown--;
-            } else if (cooldown <= 0) {
-                cooldown = 20;
+            }
+            if (cooldown <= 0) {
                 Ponder = true;
+                diceroll = (int)(Math.random()*6+1);
+                player.incrementStat(PonderingStat.PONDER);
                 world.playSound(player, pos, SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.BLOCKS);
+                cooldown = 20;
             }
         }
-        return super.onUse(state, world, pos, player, hit);
+        return ActionResult.SUCCESS;
     }
 
     @Override
@@ -85,4 +88,12 @@ public class OrbBlock extends Block {
         return SHAPE;
     }
 
+    @Override
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        double d = pos.getX() + random.nextDouble();
+        double e = pos.getY() + random.nextDouble();
+        double f = pos.getZ() + random.nextDouble();
+        world.addParticle(ParticleTypes.ENCHANT, d, e, f, 0.0, 0.0, 0.0);
+        super.randomDisplayTick(state, world, pos, random);
+    }
 }

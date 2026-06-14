@@ -1,3 +1,5 @@
 {
-  "item.ponder.pondering_orb": "Pondering Orb"
+  "block.ponder.pondering_orb": "Pondering Orb",
+
+  "stat.ponder.pondering": "Orbs Pondered"
 }
