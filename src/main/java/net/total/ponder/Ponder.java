@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.util.Identifier;
 import net.total.ponder.block.PonderOrbs;
+import net.total.ponder.entity.PonderEntities;
 import net.total.ponder.statistics.PonderingStat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,8 @@ public class Ponder implements ModInitializer {
 	public void onInitialize() {
 		PonderOrbs.registerPondering();
 		PonderingStat.registerStats();
+		PonderEntities.registerModEntityTypes();
+		PonderEntities.registerAttributes();
 		LOGGER.info("Hello Fabric world!");
 	}
 }
