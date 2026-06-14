@@ -14,6 +14,8 @@ import net.total.ponder.Ponder;
 public class PonderOrbs {
     public static final Block PONDERING_ORB = registerBlock("pondering_orb",
             new OrbBlock(AbstractBlock.Settings.create().strength(1.5f).sounds(BlockSoundGroup.GLASS).luminance(state -> 5)));
+    public static final Block SCRYING_ORB = registerBlock("scrying_orb",
+            new SmallOrbBlock(AbstractBlock.Settings.create().strength(1f).sounds(BlockSoundGroup.GLASS).luminance(state -> 2)));
 
     private static Block registerBlock(String name, Block block){
         registerBlockItem(name, block);

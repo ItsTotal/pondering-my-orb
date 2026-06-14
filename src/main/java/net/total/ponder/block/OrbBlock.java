@@ -16,7 +16,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -42,7 +41,7 @@ public class OrbBlock extends Block {
     int cooldown = 20;
     int diceroll = (int)(Math.random()*6+1);
     boolean Ponder = true;
-    
+
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (player.getMainHandStack().getItem() instanceof MilkBucketItem milkBucketItem) {
@@ -51,7 +50,7 @@ public class OrbBlock extends Block {
                 Criteria.CONSUME_ITEM.trigger(serverPlayerEntity, player.getMainHandStack());
                 serverPlayerEntity.incrementStat(Stats.USED.getOrCreateStat(milkBucketItem));
             }
-            player.setStackInHand(Hand.MAIN_HAND,ItemUsage.exchangeStack(player.getMainHandStack(), player, new ItemStack(Items.BUCKET), false));
+            player.setStackInHand(Hand.MAIN_HAND, ItemUsage.exchangeStack(player.getMainHandStack(), player, new ItemStack(Items.BUCKET), false));
             return ActionResult.SUCCESS;
         }
 

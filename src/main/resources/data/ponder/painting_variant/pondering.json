@@ -1,0 +1,11 @@
+{
+  "asset_id": "ponder:pondering",
+  "height": 2,
+  "width": 2,
+  "author": {
+    "translate": "painting.ponder.pondering.author"
+  },
+  "title": {
+    "translate": "painting.ponder.pondering.title"
+  }
+}

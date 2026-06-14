@@ -14,6 +14,11 @@ import net.total.ponder.Ponder;
 
 public class PonderEntities {
 
+    public static final EntityType<FushigiProjectileEntity> FUSHIGI = Registry.register(Registries.ENTITY_TYPE,
+            Identifier.of(Ponder.MOD_ID, "fushigi"),
+            EntityType.Builder.create(FushigiProjectileEntity::new, SpawnGroup.MISC)
+                    .dimensions(1,1).build("fushigi_proj"));
+
     public static final EntityType<EvilPonderOrb> EVIL_PONDER_ORB = Registry.register(Registries.ENTITY_TYPE,
             Identifier.of(Ponder.MOD_ID, "ponder_orb"),
             EntityType.Builder.<EvilPonderOrb>create(EvilPonderOrb::new, SpawnGroup.MISC)

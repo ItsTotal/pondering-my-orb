@@ -1,5 +1,15 @@
 {
   "block.ponder.pondering_orb": "Pondering Orb",
+  "block.ponder.scrying_orb": "Scrying Orb",
 
-  "stat.ponder.pondering": "Orbs Pondered"
+  "item.ponder.fushigi": "Fushigi",
+
+  "stat.ponder.pondering": "Orbs Pondered",
+
+  "painting.ponder.pondering.title": "Pondering",
+  "painting.ponder.pondering.author": "TheJpg",
+  "painting.ponder.ponderingbnw.title": "Pondering Through the Eyes of a Dog",
+  "painting.ponder.ponderingbnw.author": "TheJpg",
+
+  "entity.ponder.fushigi": "Fushigi"
 }

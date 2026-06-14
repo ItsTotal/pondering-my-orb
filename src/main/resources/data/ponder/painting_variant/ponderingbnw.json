@@ -1,0 +1,11 @@
+{
+  "asset_id": "ponder:ponderingbnw",
+  "height": 2,
+  "width": 2,
+  "author": {
+    "translate": "painting.ponder.ponderingbnw.author"
+  },
+  "title": {
+    "translate": "painting.ponder.ponderingbnw.title"
+  }
+}
