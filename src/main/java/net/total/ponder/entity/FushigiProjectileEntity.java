@@ -1,7 +1,9 @@
 package net.total.ponder.entity;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
@@ -12,25 +14,18 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.total.ponder.item.PonderItems;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
 
-public class FushigiProjectileEntity extends ThrownItemEntity {
+public class FushigiProjectileEntity extends PersistentProjectileEntity {
     private float rotation;
     public Vector2f groundedOffset;
 
-    public FushigiProjectileEntity(EntityType<? extends ThrownItemEntity> entityType, World world) {
+    protected FushigiProjectileEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
         super(entityType, world);
     }
 
 
-
-    public float getRenderingRotation(){
-        rotation += 0.5f;
-        if (rotation >= 360){
-            rotation = 0;
-        }
-        return rotation;
-    }
 
 
     @Override
@@ -41,13 +36,16 @@ public class FushigiProjectileEntity extends ThrownItemEntity {
 
         if (!this.getWorld().isClient()){
             this.getWorld().sendEntityStatus(this, (byte)3);
-            this.discard();
+            //this.discard();
         }
+
+        this.setVelocity(0,0,0);
     }
+
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        super.onBlockHit(blockHitResult);
+        //super.onBlockHit(blockHitResult);
 
         if(blockHitResult.getSide() == Direction.DOWN){
             groundedOffset = new Vector2f(215f, 180f);
@@ -55,7 +53,8 @@ public class FushigiProjectileEntity extends ThrownItemEntity {
     }
 
     @Override
-    protected Item getDefaultItem() {
-        return PonderItems.FUSHIGI;
+    protected ItemStack getDefaultItemStack() {
+        return PonderItems.FUSHIGI.getDefaultStack();
     }
+
 }

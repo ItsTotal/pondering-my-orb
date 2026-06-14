@@ -8,13 +8,13 @@ import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.total.ponder.block.PonderOrbs;
 import net.total.ponder.entity.PonderEntities;
 import net.total.ponder.entity.client.rendering.EvilPonderOrbRenderer;
+import net.total.ponder.entity.client.rendering.FushigiRenderer;
 
 public class PonderClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         EntityRendererRegistry.register(PonderEntities.EVIL_PONDER_ORB, EvilPonderOrbRenderer::new);
-        EntityRendererRegistry.register(PonderEntities.FUSHIGI, (context) ->
-                new FlyingItemEntityRenderer(context));
+        EntityRendererRegistry.register(PonderEntities.FUSHIGI, FushigiRenderer::new);
 
 
         BlockRenderLayerMap.INSTANCE.putBlock(PonderOrbs.SCRYING_ORB, RenderLayer.getTranslucent());
