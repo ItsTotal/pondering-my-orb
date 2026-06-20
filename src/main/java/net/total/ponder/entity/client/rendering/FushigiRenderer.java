@@ -10,6 +10,8 @@ import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.FlyingItemEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import net.total.ponder.entity.FushigiProjectileEntity;
 import org.joml.Quaternionf;
 
@@ -20,18 +22,15 @@ public class FushigiRenderer extends EntityRenderer<FushigiProjectileEntity> {
 
     @Override
     public void render(FushigiProjectileEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        if (entity.age >= 2 || !(this.dispatcher.camera.getFocusedEntity().squaredDistanceTo(entity) < (double)12.25F)) {
-            matrices.push();
-            var rotationVector = entity.getRotationVector().normalize();
-            float ryaw = (float) Math.atan2(rotationVector.x, rotationVector.z);
-            float rpitch = (float) Math.asin(rotationVector.y);
-            Quaternionf quaternionf = new Quaternionf().rotateY(ryaw).rotateX(rpitch);
-            matrices.multiply(quaternionf);
-            ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
-            itemRenderer.renderItem(entity.getItemStack(), ModelTransformationMode.GROUND, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, entity.getWorld(), entity.getId());
-            matrices.pop();
-            super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
-        }
+        matrices.push();
+        matrices.translate(0, 0.1, 0);
+
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(MathHelper.lerp(tickDelta, entity.prevYaw, entity.getYaw()) - 90.0F));
+
+        ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
+        itemRenderer.renderItem(entity.getDefaultItemStack(), ModelTransformationMode.GROUND, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, entity.getWorld(), entity.getId());
+
+        matrices.pop();
     }
 
     @Override

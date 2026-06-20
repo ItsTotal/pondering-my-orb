@@ -1,59 +1,216 @@
 package net.total.ponder.entity;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.*;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.*;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.total.ponder.Ponder;
 import net.total.ponder.item.PonderItems;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
 
-public class FushigiProjectileEntity extends PersistentProjectileEntity {
-    private float rotation;
-    public Vector2f groundedOffset;
+import java.util.function.Predicate;
 
-    protected FushigiProjectileEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
+import static net.minecraft.entity.projectile.ProjectileUtil.getEntityCollision;
+
+public class FushigiProjectileEntity extends Entity {
+
+    public FushigiProjectileEntity(EntityType<? extends Entity> entityType, World world) {
         super(entityType, world);
     }
 
-
-
-
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
-        super.onEntityHit(entityHitResult);
-        Entity entity = entityHitResult.getEntity();
-        entity.damage(this.getDamageSources().thrown(this, this.getOwner()), 8);
+    protected void initDataTracker(DataTracker.Builder builder) {
 
-        if (!this.getWorld().isClient()){
-            this.getWorld().sendEntityStatus(this, (byte)3);
-            //this.discard();
-        }
-
-        this.setVelocity(0,0,0);
     }
 
 
-    @Override
-    protected void onBlockHit(BlockHitResult blockHitResult) {
-        //super.onBlockHit(blockHitResult);
+    @Nullable
+    private BlockState inBlockState;
+    private boolean onGround;
+    private double lastXno0 = 1;
+    private double lastYno0;
+    private double lastZno0 = 0;
+    public LivingEntity owner;
 
-        if(blockHitResult.getSide() == Direction.DOWN){
-            groundedOffset = new Vector2f(215f, 180f);
+
+    @Override
+    public void tick() {
+
+        BlockPos blockPos = this.getBlockPos();
+        BlockState blockState = this.getWorld().getBlockState(blockPos);
+
+        if (this.isTouchingWaterOrRain() || blockState.isOf(Blocks.POWDER_SNOW)) {
+            this.extinguish();
         }
+
+        if (!this.isOnGround()) {
+            applyGravity();
+        } else {
+            applyDrag();
+        }
+
+        if (getTotalVelocity() < 0.01) {
+            this.setVelocity(0,0,0);
+        }
+
+        Vec3d vec3d = this.getVelocity();
+        double e = vec3d.x;
+        double f = vec3d.y;
+        double g = vec3d.z;
+
+        if (Math.abs(vec3d.x) > 0) lastXno0 = vec3d.x;
+        if (Math.abs(vec3d.y) > 0) lastYno0 = vec3d.y;
+        if (Math.abs(vec3d.z) > 0) lastZno0 = vec3d.z;
+
+
+        double h = this.getX() + e;
+        double j = this.getY() + f;
+        double k = this.getZ() + g;
+
+        if (getTotalVelocity()>0.1) {
+            this.setYaw((float) (MathHelper.atan2(lastXno0, lastZno0) * (double) (180F / (float) Math.PI)));
+            this.setPitch((float) (MathHelper.atan2(-lastYno0, Math.sqrt(lastXno0*lastXno0 + lastZno0*lastZno0)) * (double) (180F / (float) Math.PI)));
+        }
+
+        float m = 0.99F;
+        if (this.isTouchingWater()) {
+            for(int n = 0; n < 4; ++n) {
+                float o = 0.25F;
+                this.getWorld().addParticle(ParticleTypes.BUBBLE, h - e * (double)0.25F, j - f * (double)0.25F, k - g * (double)0.25F, e, f, g);
+            }
+
+            m = 0.75f;
+        }
+
+        double l = e + Math.sin(getYaw());
+        double n = k + Math.cos(getYaw());
+
+        this.setVelocity(vec3d.multiply((double)m));
+
+        if (getTotalVelocity() >= 0) {
+            if (this.getWorld() instanceof ServerWorld serverWorld) {
+                HitResult hitResult = getCollision(this, entity -> true, 0.5d);
+                if (hitResult instanceof EntityHitResult entityHitResult) {
+                        Entity entity = entityHitResult.getEntity();
+                        if (!(entity == owner && age < 10)) {
+                        if (entity instanceof LivingEntity livingEntity) {
+                            livingEntity.damage(livingEntity.getDamageSources().mobProjectile(this, owner), (float) (15 * getTotalVelocity() / 0.5));
+                        }
+                        entity.setVelocity(this.getVelocity());
+                        this.setVelocity(0,0,0);
+}
+                }
+            }
+        }
+
+
+        this.move(MovementType.SELF, new Vec3d(e,f,g));
+        this.checkBlockCollision();
+    }
+
+
+    public static HitResult getCollision(Entity entity, Predicate<Entity> predicate, double range) {
+        Vec3d vec3d = entity.getRotationVector().multiply(-range, range, range);
+        World world = entity.getWorld();
+        Vec3d vec3d2 = entity.getEyePos();
+        return getCollision(vec3d2, entity, predicate, vec3d, world, 0.0F, RaycastContext.ShapeType.COLLIDER);
+    }
+
+    private static HitResult getCollision(Vec3d pos, Entity entity, Predicate<Entity> predicate, Vec3d velocity, World world, float margin, RaycastContext.ShapeType raycastShapeType) {
+        Vec3d vec3d = pos.add(velocity);
+        HitResult hitResult = world.raycast(new RaycastContext(pos, vec3d, raycastShapeType, RaycastContext.FluidHandling.NONE, entity));
+        if (hitResult.getType() != HitResult.Type.MISS) {
+            vec3d = hitResult.getPos();
+        }
+
+        HitResult hitResult2 = getEntityCollision(world, entity, pos, vec3d, entity.getBoundingBox().stretch(velocity).expand((double)1.0F), predicate, margin);
+        if (hitResult2 != null) {
+            hitResult = hitResult2;
+        }
+
+        return hitResult;
     }
 
     @Override
-    protected ItemStack getDefaultItemStack() {
+    public ActionResult interact(PlayerEntity player, Hand hand) {
+        if (player.isSneaking() && player.getMainHandStack().isEmpty()) {
+            player.setStackInHand(Hand.MAIN_HAND, PonderItems.FUSHIGI.getDefaultStack());
+            this.discard();
+        }
+        return super.interact(player, hand);
+    }
+
+    @Override
+    public boolean canHit() {
+        return true;
+    }
+
+    @Override
+    public boolean damage(DamageSource source, float amount) {
+        this.velocityDirty = true;
+        this.velocityModified = true;
+        this.setVelocity(source.getAttacker().getRotationVector());
+        return super.damage(source, amount);
+    }
+
+    @Override
+    public boolean isCollidable() {
+        return age > 10 && getTotalVelocity() < 0.1;
+    }
+
+    @Override
+    public void onPlayerCollision(PlayerEntity player) {
+        super.onPlayerCollision(player);
+    }
+
+    private void applyDrag() {
+        this.setVelocity(this.getVelocity().multiply(0.5f));
+    }
+
+    public double getTotalVelocity() {
+        return Math.abs(this.getVelocity().x) + Math.abs(this.getVelocity().y) + Math.abs(this.getVelocity().z);
+    }
+
+    @Override
+    protected double getGravity() {
+        return 0.15;
+    }
+
+    @Override
+    protected void readCustomDataFromNbt(NbtCompound nbt) {
+        this.setPos(nbt.getDouble("xpos"), nbt.getDouble("ypos"), nbt.getDouble("zpos"));
+    }
+
+    @Override
+    protected void writeCustomDataToNbt(NbtCompound nbt) {
+        nbt.putDouble("xpos", this.getX());
+        nbt.putDouble("ypos", this.getY());
+        nbt.putDouble("zpos", this.getZ());
+    }
+
+    public ItemStack getDefaultItemStack() {
         return PonderItems.FUSHIGI.getDefaultStack();
     }
 

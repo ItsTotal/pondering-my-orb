@@ -1,6 +1,7 @@
 package net.total.ponder.entity;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -34,19 +35,29 @@ public class EvilPonderOrb extends LivingEntity {
             this.setVelocity(0, 0.125, 0);
         } else {
             if (this.getWorld() instanceof ServerWorld world) {
-                PlayerEntity target = world.getClosestPlayer(this, 15f);
+                PlayerEntity target = world.getClosestPlayer(this, 25f);
                 if (target != null) {
                     float distance = this.distanceTo(target);
                     lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, target.getPos().add(0, 1, 0));
                     this.setVelocity(this.getRotationVector().multiply(0.05 + (0.05 * distance)));
+                    if (age % Math.max((int) distance*4, 1) == 0) {
+                        playSound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), 0.05f, 1f);
+                    }
                 }
             }
 
-            if (age % 10 == 0) {
-                playSound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), 0.05f, 1f);
-            }
         }
         super.tick();
+    }
+
+    @Override
+    public boolean shouldRender(double distance) {
+        return true;
+    }
+
+    @Override
+    public boolean shouldRender(double cameraX, double cameraY, double cameraZ) {
+        return true;
     }
 
     @Override

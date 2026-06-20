@@ -23,8 +23,9 @@ public class FushigiItem extends Item {
         world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5f, 0.4f / (world.getRandom().nextFloat() * 0.4f + 0.8f));
         if (!world.isClient) {
             FushigiProjectileEntity fushigi = PonderEntities.FUSHIGI.create(world);
-            fushigi.setVelocity(user, user.getPitch(), user.getYaw(), 0.0f, 1.5f, 0f);
+            fushigi.setVelocity(user.getRotationVector().multiply(1.5f));
             fushigi.setPosition(user.getEyePos());
+            fushigi.owner = user;
             world.spawnEntity(fushigi);
         }
 
