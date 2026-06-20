@@ -109,49 +109,26 @@ public class FushigiProjectileEntity extends Entity {
 
         this.setVelocity(vec3d.multiply((double)m));
 
-        if (getTotalVelocity() >= 0) {
+        if (this.getTotalVelocity() > 0.3) {
             if (this.getWorld() instanceof ServerWorld serverWorld) {
-                HitResult hitResult = getCollision(this, entity -> true, 0.5d);
-                if (hitResult instanceof EntityHitResult entityHitResult) {
-                        Entity entity = entityHitResult.getEntity();
-                        if (!(entity == owner && age < 10)) {
+
+                for (Entity entity : serverWorld.getOtherEntities(this, new Box(this.getPos().add(-0.2, 0, -0.2), this.getPos().add(0.2, 0.4, 0.2)))) {
+                    if (!(entity == owner && age < 10) && (entity.isPushable() || entity.isCollidable())) {
                         if (entity instanceof LivingEntity livingEntity) {
-                            livingEntity.damage(livingEntity.getDamageSources().mobProjectile(this, owner), (float) (15 * getTotalVelocity() / 0.5));
+                            livingEntity.damage(livingEntity.getDamageSources().mobProjectile(this, owner), (float) (5 * getTotalVelocity() / 0.5));
                         }
                         entity.setVelocity(this.getVelocity());
-                        this.setVelocity(0,0,0);
-}
+                        this.setVelocity(this.getVelocity().multiply(-0.5));
+                    }
                 }
             }
         }
 
 
-        this.move(MovementType.SELF, new Vec3d(e,f,g));
+        this.move(MovementType.SELF, this.getVelocity());
         this.checkBlockCollision();
     }
 
-
-    public static HitResult getCollision(Entity entity, Predicate<Entity> predicate, double range) {
-        Vec3d vec3d = entity.getRotationVector().multiply(-range, range, range);
-        World world = entity.getWorld();
-        Vec3d vec3d2 = entity.getEyePos();
-        return getCollision(vec3d2, entity, predicate, vec3d, world, 0.0F, RaycastContext.ShapeType.COLLIDER);
-    }
-
-    private static HitResult getCollision(Vec3d pos, Entity entity, Predicate<Entity> predicate, Vec3d velocity, World world, float margin, RaycastContext.ShapeType raycastShapeType) {
-        Vec3d vec3d = pos.add(velocity);
-        HitResult hitResult = world.raycast(new RaycastContext(pos, vec3d, raycastShapeType, RaycastContext.FluidHandling.NONE, entity));
-        if (hitResult.getType() != HitResult.Type.MISS) {
-            vec3d = hitResult.getPos();
-        }
-
-        HitResult hitResult2 = getEntityCollision(world, entity, pos, vec3d, entity.getBoundingBox().stretch(velocity).expand((double)1.0F), predicate, margin);
-        if (hitResult2 != null) {
-            hitResult = hitResult2;
-        }
-
-        return hitResult;
-    }
 
     @Override
     public ActionResult interact(PlayerEntity player, Hand hand) {
@@ -172,6 +149,7 @@ public class FushigiProjectileEntity extends Entity {
         this.velocityDirty = true;
         this.velocityModified = true;
         this.setVelocity(source.getAttacker().getRotationVector());
+        if (source.getAttacker() instanceof LivingEntity livingEntity) this.owner = livingEntity;
         return super.damage(source, amount);
     }
 
@@ -186,7 +164,7 @@ public class FushigiProjectileEntity extends Entity {
     }
 
     private void applyDrag() {
-        this.setVelocity(this.getVelocity().multiply(0.5f));
+        this.setVelocity(this.getVelocity().multiply(0.75f));
     }
 
     public double getTotalVelocity() {
