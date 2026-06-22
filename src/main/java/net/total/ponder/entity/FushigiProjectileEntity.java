@@ -2,6 +2,8 @@ package net.total.ponder.entity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.StainedGlassBlock;
+import net.minecraft.block.StainedGlassPaneBlock;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -122,6 +124,10 @@ public class FushigiProjectileEntity extends Entity {
                     }
                 }
             }
+        }
+
+        if (this.getWorld().getBlockState(blockPos).getBlock() instanceof StainedGlassPaneBlock) {
+            this.getWorld().breakBlock(blockPos, false, this);
         }
 
 
